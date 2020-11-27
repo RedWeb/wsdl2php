@@ -45,7 +45,7 @@ class BasicWsdlGenerationTest extends TestCase
             ['Ex\\AuthHeader'],
             ['Ex\\AuthHeaderLocal'],
             ['Ex\\BFault'],
-            ['Ex\\CustomComplexType'],
+            ['Ex\\CustomComplexT'],
             ['Ex\\DoSomething'],
             ['Ex\\DoSomethingResponse'],
             ['Ex\\GetMultiParam'],
