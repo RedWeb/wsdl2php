@@ -2,9 +2,12 @@
 namespace GoetasWebservices\WsdlToPhp\Generation;
 
 use Doctrine\Common\Inflector\Inflector;
+use Exception;
+use GoetasWebservices\XML\SOAPReader\Soap\Operation;
 use GoetasWebservices\XML\SOAPReader\Soap\OperationMessage;
 use GoetasWebservices\XML\SOAPReader\Soap\Service;
 use GoetasWebservices\Xsd\XsdToPhp\Jms\YamlConverter;
+use RuntimeException;
 
 class JmsSoapConverter extends SoapConverter
 {
@@ -52,14 +55,14 @@ class JmsSoapConverter extends SoapConverter
         return $ret;
     }
 
-    private function visitService(\GoetasWebservices\XML\SOAPReader\Soap\Service $service, array &$visited)
+    private function visitService(Service $service, array &$visited)
     {
         if ($service->getVersion() === '1.1') {
             $this->soapEnvelopeNs = self::SOAP;
         } elseif ($service->getVersion() === '1.2') {
             $this->soapEnvelopeNs = self::SOAP_12;
         } else {
-            throw new \RuntimeException("SOAP version '".$service->getVersion(). "'' is not supported");
+            throw new RuntimeException("SOAP version '".$service->getVersion(). "'' is not supported");
         }
 
         if (isset($visited[spl_object_hash($service)])) {
@@ -72,7 +75,7 @@ class JmsSoapConverter extends SoapConverter
         }
     }
 
-    private function visitOperation(\GoetasWebservices\XML\SOAPReader\Soap\Operation $operation, Service $service)
+    private function visitOperation(Operation $operation, Service $service)
     {
         $this->visitMessage($operation->getInput(), 'input', $operation, $service);
         if (null !== ($output = $operation->getOutput())) {
@@ -80,7 +83,7 @@ class JmsSoapConverter extends SoapConverter
         }
     }
 
-    private function visitMessage(OperationMessage $message, $hint = '', \GoetasWebservices\XML\SOAPReader\Soap\Operation $operation, Service $service)
+    private function visitMessage(OperationMessage $message, string $hint, Operation $operation, Service $service)
     {
         if (!isset($this->classes[spl_object_hash($message)])) {
             $className = $this->findPHPName($message, Inflector::classify($hint), $this->baseNs[$service->getVersion()]['parts']);
